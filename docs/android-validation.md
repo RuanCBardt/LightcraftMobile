@@ -28,3 +28,13 @@ The DNG-preset test uses a synthetic packet, not a user's real preset pack. This
 visual parity with Lightroom. Physical ARM64 device performance, large RAW memory behavior,
 HEIC, the full upstream desktop CI and Play Store distribution were not validated.
 No shared upstream image-processing code was changed.
+
+## Version 0.2.0 — reference layout and photo swipes
+
+Kotlin compilation, `assembleDebug`, `lintDebug` (0 errors) and all 3 Android instrumentation tests
+passed on the dedicated API 36 x86_64 emulator. The expanded Compose flow performs real swipes on
+the photo: next/previous, vertical drag, short drag, group boundaries, preservation of manual edits,
+and crop-gesture isolation. It also checks intensity cancellation, confirmation and undo. The native
+import/render test and export flow remain green. Preset-strip and intensity screenshots use an
+original procedural landscape, and were captured for visual inspection. User reference photographs
+are not included in the app, test sources, commits or release artifacts. The Rust engine is unchanged.

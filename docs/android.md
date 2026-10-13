@@ -6,6 +6,16 @@ The native Kotlin / Compose app in `apps/android` exposes three panels: Presets,
 Crop. The horizontal strip shows real previews of the current photo, numbered tiles, groups,
 persistent favorites and an amount slider. It does not embed the desktop interface.
 
+In version 0.2.0 the editor has a black canvas, a larger photo, compact adjacent preset tiles with
+colored name strips, and a separate amount screen with a thin slider and cancel/confirm actions.
+Horizontal swipes on the photo move by one preset in the visible group (left = next, right = previous),
+including Original, stopping at the ends. The selected tile scrolls into view. Manual overrides and
+crop remain intact when changing presets. Vertical and sub-threshold drags do not change the preset;
+crop mode uses its own gestures. Long-press still compares the original. Tap the active preset to
+edit its amount; cancellation restores the initial value and confirmation is one undo step.
+Provisional intensity values are not persisted to the draft until confirmation; Android back
+also cancels the intensity edit. Swipe navigation is disabled while adjusting intensity or crop.
+
 `crates/mobile` is a `cdylib` façade over `lightcraft-engine`. Its JNI boundary accepts a JSON
 request and returns `{ok, data}` or `{ok: false, error}`. One session and one photo are retained.
 Operations: `init`, `presets`, `open`, `importPresets`, `render`. Every render rebuilds settings

@@ -8,6 +8,8 @@ Interface Kotlin / Jetpack Compose e processamento local com o motor Rust do Lig
 - Importar fotos da galeria ou de arquivos, incluindo DNG.
 - Importar presets DNG, XMP, `.lrtemplate`, `.lcpreset` e pacotes ZIP.
 - Faixa horizontal com prévias da própria foto, grupos, favoritos (pressione um preset) e intensidade 0–200%.
+- Deslize a foto para a esquerda/direita para avançar/voltar entre os presets do grupo visível.
+- Toque no preset selecionado para abrir a intensidade; confirme com ✓ ou cancele com ×.
 - Exposição, contraste, realces, sombras, brancos, pretos, saturação, vibração, temperatura, matiz,
   clareza, textura, desembaçar, vinheta e granulação.
 - Recorte livre com cantos arrastáveis, proporções iniciais 1:1 / 4:5 / 3:2 / 16:9 e rotação de 90°.

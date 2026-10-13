@@ -68,8 +68,13 @@ data class EditorUi(
     val tab: String = "Presets",
     val group: String = "Todos",
     val canUndo: Boolean = false,
+    val editingAmount: Boolean = false,
     val message: String? = null,
 )
+
+fun EditorUi.visiblePresets(): List<FilterPreset> = presets.filter {
+    group == "Todos" || (group == "Favoritos" && it.id in favorites) || it.group == group
+}
 
 class EditorViewModel(application: Application) : AndroidViewModel(application) {
     private val app = application
@@ -83,6 +88,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     private var thumbnailJob: Job? = null
     private var source: File? = null
     private var revision = 0
+    private var amountStart: EditState? = null
 
     init {
         viewModelScope.launch {
@@ -148,7 +154,8 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         source = file
         val original = renderBitmap(EditState(), 1440)
         history.clear()
-        state.update { it.copy(hasPhoto = true, photoName = name, original = original.bitmap, preview = original.bitmap, edit = edit, effectiveControls = original.controls, thumbnails = emptyMap(), loading = false, canUndo = false) }
+        amountStart = null
+        state.update { it.copy(hasPhoto = true, photoName = name, original = original.bitmap, preview = original.bitmap, edit = edit, effectiveControls = original.controls, thumbnails = emptyMap(), loading = false, canUndo = false, editingAmount = false) }
         saveDraft(edit)
         // Keep the current source for process-death restoration, remove old imported copies.
         withContext(Dispatchers.IO) { app.filesDir.listFiles()?.filter { it.name.startsWith("input-") && it != file }?.forEach { it.delete() } }
@@ -217,6 +224,32 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     fun undo() { if (history.isNotEmpty()) change(history.removeLast(), false) }
     fun reset() = change(EditState())
     fun selectPreset(id: String?) = change(state.value.edit.copy(preset = id, amount = 100f))
+    /** One neighboring visible preset per completed horizontal swipe, stopping at either end. */
+    fun stepPreset(direction: Int) {
+        val snapshot = state.value
+        if (!snapshot.hasPhoto || snapshot.loading || snapshot.exporting || snapshot.editingAmount || snapshot.tab == "Recortar") return
+        val ids = listOf<String?>(null) + snapshot.visiblePresets().map { it.id }
+        val index = ids.indexOf(snapshot.edit.preset)
+        val next = if (index < 0) { if (direction > 0) 1 else 0 } else index + direction.coerceIn(-1, 1)
+        if (next in ids.indices && next != index) selectPreset(ids[next])
+    }
+    fun beginAmount() {
+        if (state.value.edit.preset == null || state.value.loading || state.value.exporting || state.value.editingAmount) return
+        amountStart = state.value.edit
+        state.update { it.copy(editingAmount = true) }
+    }
+    fun previewAmount(amount: Float) = change(state.value.edit.copy(amount = amount.coerceIn(0f, 200f)), false)
+    fun finishAmount(confirm: Boolean) {
+        val start = amountStart ?: return
+        amountStart = null
+        if (!confirm) change(start, false)
+        else if (start != state.value.edit) {
+            if (history.size >= 40) history.removeFirst()
+            history.addLast(start)
+        }
+        state.update { it.copy(editingAmount = false, canUndo = history.isNotEmpty()) }
+        requestPreview()
+    }
     fun selectTab(tab: String) { state.update { it.copy(tab = tab) }; requestPreview() }
     fun selectGroup(group: String) { state.update { it.copy(group = group) } }
     fun toggleFavorite(id: String) {
@@ -230,16 +263,18 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         if (!state.value.hasPhoto) return
         val generation = ++revision
         previewJob?.cancel()
+        state.update { it.copy(rendering = true) }
         previewJob = viewModelScope.launch {
             delay(100)
-            state.update { it.copy(rendering = true) }
             val snapshot = state.value
             val edit = if (snapshot.tab == "Recortar") snapshot.edit.copy(crop = CropRect()) else snapshot.edit
             try {
                 val bitmap = renderBitmap(edit, 1440)
                 ensureActive()
-                if (generation == revision) state.update { it.copy(preview = bitmap.bitmap, effectiveControls = bitmap.controls, rendering = false) }
-                saveDraft(snapshot.edit)
+                if (generation == revision) state.update { it.copy(preview = bitmap.bitmap, effectiveControls = bitmap.controls) }
+                // Amount previews are provisional until ✓; a process restart must
+                // recover the last committed edit, never an unconfirmed slider value.
+                if (!snapshot.editingAmount) saveDraft(snapshot.edit)
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) { error(e) }
             finally { if (generation == revision) state.update { it.copy(rendering = false) } }

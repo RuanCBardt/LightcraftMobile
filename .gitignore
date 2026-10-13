@@ -22,3 +22,4 @@ apps/android/**/build/
 apps/android/local.properties
 apps/android/app/src/main/jniLibs/
 /artifacts/
+/.codex-remote-attachments/
