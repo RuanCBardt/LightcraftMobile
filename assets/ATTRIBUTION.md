@@ -8,6 +8,8 @@ covers a whole directory), or if a licence file referenced in the Licence column
 
 | Path | Asset | Creator | Source | Licence | Added | Modifications |
 |---|---|---|---|---|---|---|
+| `apps/android/app/src/main/res/drawable/ic_launcher.xml` | Mobile L monogram icon | Lightcraft Mobile contributors | original work, vector paths | MIT OR Apache-2.0 | 2026-10-13 | none |
+| `apps/android/app/src/main/java/com/lightcraft/mobile/MainActivity.kt` | Empty-studio geometric illustration | Lightcraft Mobile contributors | original work, Compose Canvas shapes | MIT OR Apache-2.0 | 2026-10-13 | none |
 | `assets/fonts/Inter-*.ttf` (Regular, Medium, SemiBold) | Inter | Rasmus Andersson | https://github.com/rsms/inter | SIL Open Font License 1.1 (`assets/fonts/OFL-Inter.txt`) | 2026-09-30 | none |
 | `assets/app-icon/` (`lightcraft.svg` and the PNG/ICNS/ICO/SVG files derived from it) | LightCraft app icon (lynx) | LightCraft project owner (drawn in ArtCraft) | original work (vectorised from the owner's drawing; see `assets/app-icon/README.md`) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) | 2026-10-02 | vectorised to SVG; rendered to PNG/ICNS/ICO by `packaging/icons.sh` |
 | `assets/camera-profiles/*.json` | Camera colour profiles (matrix + hue/saturation/value table), built into LightCraft | ILCE-7M4: Harald Hoyer | original work: fitted by `lightcraft-cli calibrate` to the contributor's own raw photos and their in-camera JPEGs (597 ILCE-7M4 photos, 2026); aggregate colour statistics only, no image content; no Adobe or third-party profile data | MIT OR Apache-2.0 | 2026-10-07 | none |

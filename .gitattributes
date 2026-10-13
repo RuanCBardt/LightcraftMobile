@@ -1,0 +1,3 @@
+apps/android/gradlew text eol=lf
+scripts/*.sh text eol=lf
+*.bat text eol=crlf

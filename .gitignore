@@ -14,3 +14,11 @@ plan/
 # model weights are never committed (SAM 3: docs/ai-masks.md)
 *.safetensors
 *.safetensors.part
+
+# Android build products and machine-local SDK locations
+apps/android/.gradle/
+apps/android/.kotlin/
+apps/android/**/build/
+apps/android/local.properties
+apps/android/app/src/main/jniLibs/
+/artifacts/

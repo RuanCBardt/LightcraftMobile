@@ -1,5 +1,17 @@
 # LightCraft — instructions for agents
 
+## Android fork scope
+The mobile product lives in `apps/android`, with the native façade in `crates/mobile`.
+Upstream desktop crates remain available for updates; the Android UI exposes only photo import,
+presets, manual adjustments, crop/rotate, undo and JPEG export. See `docs/android.md`.
+Android validation uses Gradle lint, Kotlin compilation, Rust checks/tests and Android instrumentation
+tests on a dedicated emulator (including Compose screenshots), rather than the desktop control channel.
+The additional FFI boundary is `crates/mobile/src/lib.rs`: its Android JNI entry point permits only
+the `unsafe(no_mangle)` export attribute. No unsafe blocks or raw-pointer dereferences are permitted.
+CPU rendering is intentional in the first Android release. Do not add accounts, cloud, photo-library
+management or AI features unless requested. Validate mobile changes with the mobile CI workflow;
+full upstream `cargo xtask ci` remains required for changes to shared upstream processing code.
+
 LightCraft is a clean-room, open-source, pure-Rust photo library + non-destructive raw developer targeting Adobe Lightroom parity (and beyond). Native on macOS, Windows, Linux; web via WASM. Sibling of `../pdfcraft` (Acrobat), `../photocraft` (Photoshop), `../vectorcraft` (Illustrator) and `../filmcraft` (Premiere), with the same conventions.
 
 ## Start every session here
